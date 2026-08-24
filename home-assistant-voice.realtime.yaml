@@ -2309,6 +2309,39 @@ micro_wake_word:
                                   - script.execute: control_leds
 
 select:
+  # The stock voice_assistant component normally owns wake-word selection, but
+  # this firmware replaces it with va_client. Expose an equivalent selector so
+  # exactly one regular wake model is enabled. The separate Stop model remains
+  # controlled by the reply/follow-up phase logic above.
+  - platform: template
+    name: "Wake word"
+    id: wake_word_model
+    optimistic: true
+    initial_option: Computer
+    restore_value: true
+    entity_category: config
+    options:
+      - Computer
+      - Okay Nabu
+      - Hey Jarvis
+      - Hey Mycroft
+    on_value:
+      lambda: |-
+        id(computer).disable();
+        id(okay_nabu).disable();
+        id(hey_jarvis).disable();
+        id(hey_mycroft).disable();
+
+        if (x == "Computer") {
+          id(computer).enable();
+        } else if (x == "Okay Nabu") {
+          id(okay_nabu).enable();
+        } else if (x == "Hey Jarvis") {
+          id(hey_jarvis).enable();
+        } else if (x == "Hey Mycroft") {
+          id(hey_mycroft).enable();
+        }
+
   - platform: template
     name: "Wake word sensitivity"
     id: wake_word_sensitivity

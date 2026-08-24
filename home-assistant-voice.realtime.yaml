@@ -166,7 +166,6 @@ logger:
   logs:
     sensor: WARN  # avoids logging debug sensor updates
 
-
 ota:
   - platform: esphome
     id: ota_esphome
@@ -1711,8 +1710,8 @@ script:
             - lambda: id(voice_assistant_phase) = ${voice_assist_idle_phase_id};
             - script.execute: control_leds
 
-  # (Removed: stock's `activate_stop_word_once` script — orphaned in this fork.
-  # "stop" arming is owned by va_client's on_phase + followup_window_watchdog.)
+# (Removed: stock's `activate_stop_word_once` script — orphaned in this fork.
+# "stop" arming is owned by va_client's on_phase + followup_window_watchdog.)
 
 i2s_audio:
   - id: i2s_output
@@ -1872,7 +1871,6 @@ media_source:
   - platform: sendspin
     id: sendspin_media_source
     fixed_delay: 480 microseconds  # The AIC3204 DAC used, as configured, on the VPE delays audio by 480 microseconds
-
 
 voice_kit:
   id: voice_kit_component
@@ -2097,6 +2095,10 @@ micro_wake_word:
       id: hey_jarvis
     - model: hey_mycroft
       id: hey_mycroft
+    # ESPHome-compatible Computer model, pinned so upstream catalog changes
+    # cannot silently change the model used by an existing firmware config.
+    - model: https://raw.githubusercontent.com/TaterTotterson/Tater-Wake-Words/5a93faec7b28dec923c809034fdf394cd5264f59/microWakeWordsV1/computer.json
+      id: computer
     - model: https://github.com/kahrendt/microWakeWord/releases/download/stop/stop.json
       id: stop
       internal: true
@@ -2125,7 +2127,7 @@ micro_wake_word:
   # 'Stop', but VAD model doesn't" 3x in a row before finally accepting
   # (+1.5 s latency, long enough for OpenAI to win the turn race during the
   # follow-up window). Keep the gate (it still blocks non-speech noise
-  # triggers for "alexa") but make it easier to satisfy.
+  # triggers for wake words) but make it easier to satisfy.
   vad:
     probability_cutoff: 0.3
   on_wake_word_detected:
@@ -2324,16 +2326,18 @@ select:
           id(okay_nabu).set_probability_cutoff(217);    // 0.85 -> 0.000 FAPH on DipCo (Manifest's default)
           id(hey_jarvis).set_probability_cutoff(247);   // 0.97 -> 0.563 FAPH on DipCo (Manifest's default)
           id(hey_mycroft).set_probability_cutoff(253);  // 0.99 -> 0.567 FAPH on DipCo
+          id(computer).set_probability_cutoff(247);     // 0.97 (Manifest's default)
         } else if (x == "Moderately sensitive") {
           id(okay_nabu).set_probability_cutoff(176);    // 0.69 -> 0.376 FAPH on DipCo
           id(hey_jarvis).set_probability_cutoff(235);   // 0.92 -> 0.939 FAPH on DipCo
           id(hey_mycroft).set_probability_cutoff(242);  // 0.95 -> 1.502 FAPH on DipCo (Manifest's default)
+          id(computer).set_probability_cutoff(235);     // 0.92
         } else if (x == "Very sensitive") {
           id(okay_nabu).set_probability_cutoff(143);    // 0.56 -> 0.751 FAPH on DipCo
           id(hey_jarvis).set_probability_cutoff(212);   // 0.83 -> 1.502 FAPH on DipCo
           id(hey_mycroft).set_probability_cutoff(237);  // 0.93 -> 1.878 FAPH on DipCo
+          id(computer).set_probability_cutoff(212);     // 0.83
         }
-
 
 button:
   - platform: factory_reset

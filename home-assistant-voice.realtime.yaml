@@ -2088,7 +2088,7 @@ micro_wake_word:
     gain_factor: 4
   stop_after_detection: false
   models:
-    "stop" stays — it's the reliable barge-in/interrupt
+    # "stop" stays — it's the reliable barge-in/interrupt
     # word, armed only while the assistant is replying (see on_phase below).
     # kahrendt/microWakeWord redirects to the OHF-Voice org automatically.
     - model: https://github.com/kahrendt/microWakeWord/releases/download/okay_nabu_20241226.3/okay_nabu.json
